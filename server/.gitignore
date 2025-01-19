@@ -1,0 +1,11 @@
+
+node_modules
+.vercel
+.env
+
+dist
+keys
+src/core/contract/keys
+src/core/contract/zkir
+
+midnight-level-db

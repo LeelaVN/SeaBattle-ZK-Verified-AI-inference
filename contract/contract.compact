@@ -1,0 +1,110 @@
+// pragma language_version >= 0.20.0;
+
+import CompactStandardLibrary;
+
+enum GuessState { hit, miss }
+
+export { Maybe }
+
+struct Player {
+  pk: Bytes<32>,
+  ships_hash: Bytes<32>
+}
+
+export ledger players: Map<Bytes<32>, Bytes<32>>;
+export ledger room_count: Counter;
+
+export ledger players_revealed: Map<Bytes<32>, Set<Uint<8>>>;
+
+export ledger room_salt: Cell<Bytes<32>>;
+export ledger turn: Cell<Bytes<32>>;
+
+export ledger gameEnded: Cell<Boolean>;
+
+constructor(salt: Bytes<32>) {
+  room_salt = salt;
+  turn = default<Bytes<32>>;
+};
+
+export circuit create(): Void {
+  assert players.size() == 0 "Room should be empty";
+
+  players.insert(public_key(local_sk_or_error()), public_ships(local_ships_or_error()));
+  players_revealed.insert(public_key(local_sk_or_error()), default<Set<Uint<8>>>);
+}
+
+export circuit join(): Void {
+  assert players.size() == 1 "Room should contain exactly one player";
+
+  const pubkey = public_key(local_sk_or_error());
+
+  assert !players.member(public_key(local_sk_or_error())) "Player already exists in the room";
+
+  players.insert(public_key(local_sk_or_error()), public_ships(local_ships_or_error()));
+  players_revealed.insert(public_key(local_sk_or_error()), default<Set<Uint<8>>>);
+}
+
+witness attack(coordinates: Uint<8>): GuessState;
+
+export circuit move(guess: Uint<8>): GuessState {
+  assert gameEnded == false "The game has already ended, no moves are allowed";
+
+  assert players.size() == 2 "Room should contain exactly two players";
+
+  assert players_revealed.lookup(public_key(local_sk_or_error())).size() != 17 "All coordinates are revealed";
+
+  const ships_hash = players.lookup(public_key(local_sk_or_error()));
+  assert ships_hash == public_ships(local_ships_or_error()) "Ships hash does not match the stored ships hash";
+
+  assert turn != public_key(local_sk_or_error()) "It's not your turn";
+
+  assert !players_revealed.lookup(public_key(local_sk_or_error())).member(guess) "The specified coordinate has already been targeted in a previous moves";
+
+  assert guess < 100 "Guess is out of bounds: must be less than 100";
+  assert guess >= 0 "Guess is out of bounds: must be 0 or greater";
+
+  const hit_or_miss = attack(guess);
+
+  if(hit_or_miss == GuessState.hit){
+    players_revealed.lookup(public_key(local_sk_or_error())).insert(guess);
+
+    if(players_revealed.lookup(public_key(local_sk_or_error())).size() == 17){
+      gameEnded = true;
+    }
+  } else {
+    turn = public_key(local_sk_or_error());
+  }
+
+
+  return hit_or_miss;
+}
+
+witness local_ships(): Maybe<Vector<17, Uint<8>>>;
+
+export circuit public_ships(coordinates: Vector<17, Uint<8>>): Bytes<32> {
+  return persistent_commit<Vector<17, Uint<8>>>(coordinates, room_salt);
+}
+
+circuit local_ships_or_error(): Vector<17, Uint<8>> {
+  const maybe_ships = local_ships();
+  assert maybe_ships.is_some "No ships found";
+
+  for coordinate in maybe_ships.value do {
+    assert guess < 100 "Guess is out of bounds: must be less than 100";
+    assert guess >= 0 "Guess is out of bounds: must be 0 or greater";
+  }
+
+  return maybe_ships.value;
+}
+
+witness local_sk(): Maybe<Bytes<32>>;
+
+export circuit public_key(sk: Bytes<32>): Bytes<32> {
+  return persistent_hash<Vector<2, Bytes<32>>>([pad(32, "pk-domain"), sk]);
+}
+
+circuit local_sk_or_error(): Bytes<32> {
+  const maybe_sk = local_sk();
+  assert maybe_sk.is_some "No secret key found";
+  return maybe_sk.value;
+}

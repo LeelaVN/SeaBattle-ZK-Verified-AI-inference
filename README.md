@@ -1,0 +1,1 @@
+# SeaBattle - ZK Verified AI inference

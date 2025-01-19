@@ -1,0 +1,154 @@
+@import url("https://fonts.googleapis.com/css?family=Fascinate+Inline|Baloo+Bhaina");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #121212;
+}
+
+#board {
+  position: relative;
+  width: 100%;
+}
+
+#messageArea {
+  width: 100%;
+  text-align: center;
+  margin-top: 5px;
+  color: #f4f8ff;
+  font-family: "Fascinate Inline";
+  font-size: 25px;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 3px;
+  margin: 0 auto;
+}
+
+td {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border: 2px solid #152c59;
+  border-radius: 15px;
+}
+
+td:hover {
+  background: #538daa;
+}
+
+td div {
+  width: 70px;
+  height: 70px;
+}
+
+.numbers,
+.letters {
+  text-align: center;
+  font-size: 20px;
+  font-family: "Baloo Bhaina";
+  color: #f4f8ff;
+  height: 40px;
+  width: 40px;
+  border: none;
+}
+
+.hit {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  width: 60px;
+  height: 30px;
+  background: #851b15;
+  border-radius: 5px 5px 50px 35px;
+  animation: wave 1s ease-in-out infinite alternate;
+}
+
+@keyframes wave {
+  0% {
+    transform: rotate(-7deg);
+  }
+  100% {
+    transform: rotate(5deg);
+  }
+}
+
+.hit::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 10px;
+  height: 10px;
+  background: #d2995f;
+  border-radius: 50%;
+  box-shadow: 15px 0 #fcce9e, 30px 0 #d2995f;
+}
+
+.hit::before {
+  content: "";
+  position: absolute;
+  bottom: 30px;
+  left: 10px;
+  width: 16px;
+  height: 30px;
+  background: #5a0400;
+  box-shadow: 15px 4px 0 -4px #ac3b35;
+}
+
+.miss {
+  width: 60px;
+  height: 10px;
+  position: absolute;
+  top: 30px;
+  left: 5px;
+  border-radius: 5px;
+  background: #47002b;
+  transform-origin: center center;
+  transform: rotate(45deg);
+  box-shadow: 3px 3px #c77daa;
+  animation: blow 0.5s ease-in;
+}
+
+@keyframes blow {
+  0% {
+    transform: scale(0);
+  }
+  1% {
+    transform: rotate(45deg);
+  }
+  80% {
+    transform: scale(1.7);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.miss::after {
+  content: "";
+  width: 60px;
+  height: 10px;
+  position: absolute;
+  border-radius: 5px;
+  background: #47002b;
+  transform: rotate(90deg);
+  box-shadow: 3px -3px #c77daa;
+}
+
+.midnight-button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  color: #fff;
+}

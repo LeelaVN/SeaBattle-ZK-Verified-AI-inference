@@ -1,0 +1,81 @@
+{
+  "circuits": [
+    {
+      "name": "create",
+      "pure": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Void"
+      }
+    },
+    {
+      "name": "join",
+      "pure": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Void"
+      }
+    },
+    {
+      "name": "move",
+      "pure": false,
+      "arguments": [
+        {
+          "name": "guess",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 255
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Enum",
+        "name": "GuessState",
+        "elements": [
+          "hit",
+          "miss"
+        ]
+      }
+    },
+    {
+      "name": "public_ships",
+      "pure": false,
+      "arguments": [
+        {
+          "name": "coordinates",
+          "type": {
+            "type-name": "Vector",
+            "length": 17,
+            "type": {
+              "type-name": "Uint",
+              "maxval": 255
+            }
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "public_key",
+      "pure": true,
+      "arguments": [
+        {
+          "name": "sk",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    }
+  ]
+}
